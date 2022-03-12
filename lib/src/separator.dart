@@ -23,8 +23,7 @@ class _SeparatorState extends State<Separator> {
     super.initState();
 
     _info = widget.info;
-    _controller =
-        SeparatorController(widget.info.index, widget.info.parentController);
+    _controller = SeparatorController(widget.info.index, widget.info);
   }
 
   @override

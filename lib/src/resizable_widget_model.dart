@@ -32,6 +32,9 @@ class ResizableWidgetModel {
             _info.isDisabledSmartHide,
             _info.separatorSize,
             _info.separatorColor,
+            _info.onPanStart,
+            _info.onPanUpdate,
+            _info.onPanEnd,
           )),
           null));
     }

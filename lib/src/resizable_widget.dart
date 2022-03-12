@@ -8,6 +8,18 @@ import 'widget_size_info.dart';
 /// The callback argument type of [ResizableWidget.onResized].
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
 
+/// The callback Separator onPanStart event. If result of function is true, it will stop logic and will not run default reactions.
+typedef OnPanStartFunc = bool Function(
+    DragStartDetails details, BuildContext context);
+
+/// The callback Separator onPanUpdate event. If result of function is true, it will stop logic and will not run default reactions.
+typedef OnPanUpdateFunc = bool Function(
+    DragUpdateDetails details, BuildContext context);
+
+/// The callback Separator onPanEnd event. If result of function is true, it will stop logic and will not run default reactions.
+typedef OnPanEndFunc = bool Function(
+    DragEndDetails details, BuildContext context);
+
 /// Holds resizable widgets as children.
 /// Users can resize the internal widgets by dragging.
 class ResizableWidget extends StatefulWidget {
@@ -48,19 +60,34 @@ class ResizableWidget extends StatefulWidget {
   /// Note that [onResized] is called every frame when resizing [children].
   final OnResizedFunc? onResized;
 
+  /// The callback Separator onPanStart event.
+  /// If result of function is true, it will stop logic and will not run default reactions.
+  final OnPanStartFunc? onPanStart;
+
+  /// The callback Separator onPanUpdate event.
+  /// If result of function is true, it will stop logic and will not run default reactions.
+  final OnPanUpdateFunc? onPanUpdate;
+
+  /// The callback Separator onPanEnd event.
+  /// If result of function is true, it will stop logic and will not run default reactions.
+  final OnPanEndFunc? onPanEnd;
+
   /// Creates [ResizableWidget].
-  ResizableWidget({
-    Key? key,
-    required this.children,
-    this.percentages,
-    @Deprecated('Use [isHorizontalSeparator] instead')
-        this.isColumnChildren = false,
-    this.isHorizontalSeparator = false,
-    this.isDisabledSmartHide = false,
-    this.separatorSize = 4,
-    this.separatorColor = Colors.white12,
-    this.onResized,
-  }) : super(key: key) {
+  ResizableWidget(
+      {Key? key,
+      required this.children,
+      this.percentages,
+      @Deprecated('Use [isHorizontalSeparator] instead')
+          this.isColumnChildren = false,
+      this.isHorizontalSeparator = false,
+      this.isDisabledSmartHide = false,
+      this.separatorSize = 4,
+      this.separatorColor = Colors.white12,
+      this.onResized,
+      this.onPanStart,
+      this.onPanUpdate,
+      this.onPanEnd})
+      : super(key: key) {
     assert(children.isNotEmpty);
     assert(percentages == null || percentages!.length == children.length);
     assert(percentages == null ||
