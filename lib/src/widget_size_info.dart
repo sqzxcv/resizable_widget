@@ -13,7 +13,12 @@ class WidgetSizeInfo {
 
   final double delta;
 
+  final double? defaultPercentage;
+
   /// Creates [WidgetSizeInfo].
   const WidgetSizeInfo(
-      {required this.size, required this.percentage, this.delta = 0});
+      {required this.size,
+      required this.percentage,
+      this.delta = 0,
+      this.defaultPercentage});
 }

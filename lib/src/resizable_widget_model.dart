@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'resizable_widget_args_info.dart';
 import 'resizable_widget_child_data.dart';
 import 'resizable_widget_controller.dart';
-import 'separator.dart';
-import 'separator_args_info.dart';
+import 'widget_child_builder.dart';
 import 'widget_size_info.dart';
-
-typedef SeparatorFactory = Widget Function(SeparatorArgsBasicInfo basicInfo);
+import 'widgets/separator.dart';
 
 class ResizableWidgetModel {
   final ResizableWidgetArgsInfo _info;
@@ -18,29 +16,8 @@ class ResizableWidgetModel {
 
   ResizableWidgetModel(this._info);
 
-  void init(SeparatorFactory separatorFactory) {
-    final originalChildren = _info.children;
-    final size = originalChildren.length;
-    final originalPercentages =
-        _info.percentages ?? List.filled(size, 1 / size);
-    for (var i = 0; i < size - 1; i++) {
-      children.add(ResizableWidgetChildData(
-          originalChildren[i], originalPercentages[i]));
-      children.add(ResizableWidgetChildData(
-          separatorFactory.call(SeparatorArgsBasicInfo(
-            2 * i + 1,
-            _info.isHorizontalSeparator,
-            _info.isDisabledSmartHide,
-            _info.separatorSize,
-            _info.separatorColor,
-            _info.onPanStart,
-            _info.onPanUpdate,
-            _info.onPanEnd,
-          )),
-          null));
-    }
-    children.add(ResizableWidgetChildData(
-        originalChildren[size - 1], originalPercentages[size - 1]));
+  void init(ResizableWidgetController controller) {
+    children.addAll(WidgetChildBuilder(_info, controller).build());
   }
 
   void setSizeIfNeeded(BoxConstraints constraints) {
@@ -59,20 +36,25 @@ class ResizableWidgetModel {
     for (var i = 0; i < children.length; i++) {
       ResizableWidgetChildData c = children[i];
       if (c.widget is Separator) {
-        c.percentage = 0;
-        // if (prevHadNegative) {
-        //   c.size = 0;
-        //   prevHadNegative = false;
-        // } else {
-        c.size = _info.separatorSize;
-        // }
+        double size = _info.separatorSize;
+        if (prevHadNegative) {
+          size = 0;
+          prevHadNegative = false;
+        }
+        setBlockSize(c, WidgetSizeInfo(size: size, percentage: 0));
       } else {
-        c.size = remain * c.percentage!;
-        if (c.size! < 0) {
-          c.size = 0;
+        double size = remain * c.percentage!;
+        if (size < 0) {
+          size = 0;
           prevHadNegative = true;
         }
-        c.defaultPercentage = c.percentage;
+        double? defaultPercentage = c.percentage;
+        setBlockSize(
+            c,
+            WidgetSizeInfo(
+                size: size,
+                percentage: c.percentage!,
+                defaultPercentage: defaultPercentage));
       }
     }
   }
@@ -109,6 +91,10 @@ class ResizableWidgetModel {
       ResizableWidgetChildData widgetChildData, WidgetSizeInfo size) {
     widgetChildData.size = size.size;
     widgetChildData.percentage = size.percentage;
+    if (size.defaultPercentage != null) {
+      widgetChildData.defaultPercentage = size.defaultPercentage;
+    }
+    widgetChildData.needRebuild = true;
   }
 
   ResizeDirection determineResizeDirection(Offset offset) {
@@ -233,5 +219,20 @@ class ResizableWidgetModel {
 
   bool _isNearlyZero(double size) {
     return size < 2;
+  }
+
+  List<Widget> rebuildChildren() {
+    return children.map((child) {
+      if (child.needRebuild) {
+        child.mountedWidget = SizedBox(
+          width: _info.isHorizontalSeparator ? double.infinity : child.size,
+          height: _info.isHorizontalSeparator ? child.size : double.infinity,
+          child: child.widget,
+        );
+        child.needRebuild = false;
+      }
+
+      return child.mountedWidget!;
+    }).toList();
   }
 }

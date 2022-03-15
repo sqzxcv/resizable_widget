@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'resizable_widget_controller.dart';
-import 'separator_args_info.dart';
+import 'widgets/separator_info.dart';
 
 class SeparatorController {
   final int _index;
-  final SeparatorArgsInfo _info;
+  final SeparatorInfo _info;
 
   const SeparatorController(this._index, this._info);
 
