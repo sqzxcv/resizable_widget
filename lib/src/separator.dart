@@ -17,7 +17,6 @@ class Separator extends StatefulWidget {
 class _SeparatorState extends State<Separator> {
   late SeparatorArgsInfo _info;
   late SeparatorController _controller;
-
   @override
   void initState() {
     super.initState();

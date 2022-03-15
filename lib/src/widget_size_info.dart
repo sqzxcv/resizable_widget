@@ -11,6 +11,9 @@ class WidgetSizeInfo {
   /// because the ratio of the internal widgets will be maintained.
   final double percentage;
 
+  final double delta;
+
   /// Creates [WidgetSizeInfo].
-  const WidgetSizeInfo(this.size, this.percentage);
+  const WidgetSizeInfo(
+      {required this.size, required this.percentage, this.delta = 0});
 }

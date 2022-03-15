@@ -115,24 +115,29 @@ class _ResizableWidgetState extends State<ResizableWidget> {
         builder: (context, constraints) {
           _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
-            stream: _controller.eventStream.stream,
-            builder: (context, snapshot) => _info.isHorizontalSeparator
-                ? Column(
-                    children: _controller.children.map(_buildChild).toList())
-                : Row(children: _controller.children.map(_buildChild).toList()),
-          );
+              stream: _controller.eventStream.stream,
+              builder: (context, snapshot) {
+                return _info.isHorizontalSeparator
+                    ? Column(children: _buildChildren())
+                    : Row(children: _buildChildren());
+              });
         },
       );
-
-  Widget _buildChild(ResizableWidgetChildData child) {
-    if (child.widget is Separator) {
-      return child.widget;
+  List<Widget> _buildChildren() {
+    List<Widget> result = [];
+    List<ResizableWidgetChildData> children = _controller.children;
+    for (var i = 0; i < children.length; i++) {
+      ResizableWidgetChildData child = children[i];
+      if (child.widget is Separator) {
+        result.add(child.widget);
+        continue;
+      }
+      result.add(SizedBox(
+        width: _info.isHorizontalSeparator ? double.infinity : child.size,
+        height: _info.isHorizontalSeparator ? child.size : double.infinity,
+        child: child.widget,
+      ));
     }
-
-    return SizedBox(
-      width: _info.isHorizontalSeparator ? double.infinity : child.size,
-      height: _info.isHorizontalSeparator ? child.size : double.infinity,
-      child: child.widget,
-    );
+    return result;
   }
 }

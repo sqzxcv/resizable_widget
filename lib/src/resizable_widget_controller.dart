@@ -6,6 +6,8 @@ import 'resizable_widget_model.dart';
 import 'separator.dart';
 import 'separator_args_info.dart';
 
+enum ResizeDirection { top, bottom, left, right, none }
+
 class ResizableWidgetController {
   final eventStream = StreamController<Object>();
   final ResizableWidgetModel _model;
@@ -35,6 +37,10 @@ class ResizableWidgetController {
       eventStream.add(this);
       _model.callOnResized();
     }
+  }
+
+  ResizeDirection determineResizeDirection(Offset offset) {
+    return _model.determineResizeDirection(offset);
   }
 
   Widget _separatorFactory(SeparatorArgsBasicInfo basicInfo) {
