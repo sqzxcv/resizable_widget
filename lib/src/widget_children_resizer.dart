@@ -54,13 +54,10 @@ class WidgetChildrenResizer {
     }
   }
 
-  bool canBeResized(ResizableWidgetChildData widgetChildData) {
-    return (widgetChildData.size ?? 0) > 0;
-  }
-
   bool canBeSmaller(ResizableWidgetChildData widgetChildData) {
-    return (widgetChildData.minPercentage == null ||
-        widgetChildData.percentage! > widgetChildData.minPercentage!);
+    return (widgetChildData.size ?? 0) > 0 &&
+        (widgetChildData.minPercentage == null ||
+            widgetChildData.percentage! > widgetChildData.minPercentage!);
   }
 
   bool canBeBigger(ResizableWidgetChildData widgetChildData) {
@@ -143,10 +140,7 @@ class WidgetChildrenResizer {
       case ResizeDirection.left:
         ResizableWidgetChildData leftData = children[separatorIndex - 1];
         ResizableWidgetChildData rightData = children[separatorIndex + 1];
-        if (canBeResized(leftData) &&
-            canBeSmaller(leftData) &&
-            canBeResized(rightData) &&
-            canBeBigger(rightData)) {
+        if (canBeSmaller(leftData) && canBeBigger(rightData)) {
           WidgetSizeInfo newLeftSize = calculateNewSize(leftData, offset);
           // we need to set new data for correct calculation of maxPercentage in next block calculation
           // relevant in all directions
@@ -174,10 +168,7 @@ class WidgetChildrenResizer {
         ResizableWidgetChildData rightData = children[separatorIndex + 1];
         ResizableWidgetChildData leftData = children[separatorIndex - 1];
 
-        if (canBeResized(rightData) &&
-            canBeSmaller(rightData) &&
-            canBeResized(leftData) &&
-            canBeBigger(leftData)) {
+        if (canBeSmaller(rightData) && canBeBigger(leftData)) {
           WidgetSizeInfo newRightSize =
               calculateNewSize(rightData, offset * (-1));
           setBlockSize(rightData, newRightSize);
@@ -196,10 +187,7 @@ class WidgetChildrenResizer {
         ResizableWidgetChildData topData = children[separatorIndex - 1];
         ResizableWidgetChildData bottomData = children[separatorIndex + 1];
 
-        if (canBeResized(topData) &&
-            canBeSmaller(topData) &&
-            canBeResized(bottomData) &&
-            canBeBigger(bottomData)) {
+        if (canBeSmaller(topData) && canBeBigger(bottomData)) {
           WidgetSizeInfo newTopSize = calculateNewSize(topData, offset);
           setBlockSize(topData, newTopSize);
 
@@ -218,10 +206,7 @@ class WidgetChildrenResizer {
         ResizableWidgetChildData bottomData = children[separatorIndex + 1];
         ResizableWidgetChildData topData = children[separatorIndex - 1];
 
-        if (canBeResized(bottomData) &&
-            canBeSmaller(bottomData) &&
-            canBeResized(topData) &&
-            canBeBigger(topData)) {
+        if (canBeSmaller(bottomData) && canBeBigger(topData)) {
           WidgetSizeInfo newBottomSize =
               calculateNewSize(bottomData, offset * (-1));
           setBlockSize(bottomData, newBottomSize);
