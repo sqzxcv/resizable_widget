@@ -17,20 +17,27 @@ class WidgetChildBuilder {
     final originalPercentages = _calculatePercentages();
     List<ResizableWidgetChildData> result = [];
     for (var i = 0; i < size - 1; i++) {
+      ResizableWidgetChild child =
+          _buildWidget(info.children[i], originalPercentages[i], i);
       result.add(ResizableWidgetChildData(
-          widget: _buildWidget(info.children[i], originalPercentages[i], i),
+          widget: child,
           percentage: originalPercentages[i],
-          index: i));
+          index: i,
+          minPercentage: child.minPercentage,
+          maxPercentage: child.maxPercentage));
 
       result.add(ResizableWidgetChildData(
           widget: _buildSeparator(i), percentage: null, index: i));
     }
     int lastIndex = size - 1;
+    ResizableWidgetChild child = _buildWidget(
+        info.children[lastIndex], originalPercentages[lastIndex], lastIndex);
     result.add(ResizableWidgetChildData(
-        widget: _buildWidget(info.children[lastIndex],
-            originalPercentages[lastIndex], lastIndex),
+        widget: child,
         percentage: originalPercentages[lastIndex],
-        index: lastIndex));
+        index: lastIndex,
+        minPercentage: child.minPercentage,
+        maxPercentage: child.maxPercentage));
 
     return result;
   }
