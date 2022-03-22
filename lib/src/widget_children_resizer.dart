@@ -42,9 +42,11 @@ class WidgetChildrenResizer {
       final offset = _info.isHorizontalSeparator
           ? Offset(0, offsetScala * coefficient)
           : Offset(offsetScala * coefficient, 0);
+      target.visible = true;
       resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
     } else {
       // hide
+      target.visible = false;
       target.hidingPercentage = target.percentage!;
       final offsetScala = maxSizeWithoutSeparators! * target.hidingPercentage!;
       final offset = _info.isHorizontalSeparator
