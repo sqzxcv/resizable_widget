@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'resizable_widget_args_info.dart';
-import 'resizable_widget_child_data.dart';
+import 'models/resizable_widget_args_info.dart';
+import 'models/resizable_widget_child_data.dart';
 import 'resizable_widget_controller.dart';
 import 'widgets/resizable_widget_child.dart';
 import 'widgets/separator.dart';
@@ -24,7 +24,12 @@ class WidgetChildBuilder {
           percentage: originalPercentages[i],
           index: i,
           minPercentage: child.minPercentage,
-          maxPercentage: child.maxPercentage));
+          maxPercentage: child.maxPercentage,
+          visible: child.visible,
+          cursorOverflowPercentageForHidding:
+              child.cursorOverflowPercentageForHidding,
+          cursorOverflowPercentageForShowing:
+              child.cursorOverflowPercentageForShowing));
 
       result.add(ResizableWidgetChildData(
           widget: _buildSeparator(i), percentage: null, index: i));
@@ -37,7 +42,12 @@ class WidgetChildBuilder {
         percentage: originalPercentages[lastIndex],
         index: lastIndex,
         minPercentage: child.minPercentage,
-        maxPercentage: child.maxPercentage));
+        maxPercentage: child.maxPercentage,
+        visible: child.visible,
+        cursorOverflowPercentageForHidding:
+            child.cursorOverflowPercentageForHidding,
+        cursorOverflowPercentageForShowing:
+            child.cursorOverflowPercentageForShowing));
 
     return result;
   }
@@ -86,7 +96,7 @@ class WidgetChildBuilder {
         existingPercentages.fold(0, (previous, current) => previous + current!);
 
     double defaultPercentage;
-    if (existingSum <= 0 || existingSum >= 1) {
+    if (existingSum <= 0 || existingSum > 1) {
       return List.filled(info.children.length, 1 / info.children.length);
     }
 

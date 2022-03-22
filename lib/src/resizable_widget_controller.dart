@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'resizable_widget_args_info.dart';
-import 'resizable_widget_child_data.dart';
+import 'models/resizable_widget_args_info.dart';
+import 'models/resizable_widget_child_data.dart';
+import 'models/resize_args.dart';
 import 'resizable_widget_model.dart';
 
 enum ResizeDirection { top, bottom, left, right, none }
 
 class ResizableWidgetController {
-  final eventStream = StreamController<Object>();
   final ResizableWidgetModel _model;
+  Stream<Object> get resizeEventStream => _model.resizeEventStream;
+
   List<ResizableWidgetChildData> get children => _model.children;
   List<Widget> get childrenWidgets =>
       _model.children.map((e) => e.widget).toList();
@@ -23,18 +25,21 @@ class ResizableWidgetController {
     _model.callOnResized();
   }
 
-  void resize(int separatorIndex, Offset offset) {
-    _model.resize(separatorIndex, offset);
-
-    eventStream.add(this);
-    _model.callOnResized();
+  void resize(ResizeArgs data) {
+    if (_model.resize(data)) {
+      _model.callOnResized();
+    } else {
+      double? cursorOverflow = _model.cursorOverflowOffset(data);
+      if (cursorOverflow != null) {
+        _model.callOnCursorOverflow(data, cursorOverflow);
+      }
+    }
   }
 
   void tryHideOrShow(int separatorIndex) {
     final result = _model.tryHideOrShow(separatorIndex);
 
     if (result) {
-      eventStream.add(this);
       _model.callOnResized();
     }
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:resizable_widget/src/resizable_widget_args_info.dart';
+import 'package:resizable_widget/src/models/resizable_widget_args_info.dart';
 import 'package:resizable_widget/src/resizable_widget_controller.dart';
-import 'package:resizable_widget/src/widget_size_info.dart';
+import 'package:resizable_widget/src/models/widget_size_info.dart';
 
 /// The callback argument type of [ResizableWidget.onResized].
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
@@ -113,7 +113,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
         builder: (context, constraints) {
           _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
-              stream: _controller.eventStream.stream,
+              stream: _controller.resizeEventStream,
               builder: (context, snapshot) {
                 return _info.isHorizontalSeparator
                     ? Column(children: _controller.rebuildChildren())
