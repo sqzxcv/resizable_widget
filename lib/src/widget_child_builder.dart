@@ -19,37 +19,40 @@ class WidgetChildBuilder {
     for (var i = 0; i < size - 1; i++) {
       ResizableWidgetChild child =
           _buildWidget(info.children[i], originalPercentages[i], i);
-      result.add(ResizableWidgetChildData(
-          widget: child,
-          percentage: originalPercentages[i],
-          index: i,
-          minPercentage: child.minPercentage,
-          maxPercentage: child.maxPercentage,
-          visible: child.visible,
-          cursorOverflowPercentageForHidding:
-              child.cursorOverflowPercentageForHidding,
-          cursorOverflowPercentageForShowing:
-              child.cursorOverflowPercentageForShowing));
+      result.add(_buildChildData(child, originalPercentages[i], i));
 
-      result.add(ResizableWidgetChildData(
-          widget: _buildSeparator(i), percentage: null, index: i));
+      result.add(_buildChildData(_buildSeparator(i), null, i));
     }
     int lastIndex = size - 1;
     ResizableWidgetChild child = _buildWidget(
         info.children[lastIndex], originalPercentages[lastIndex], lastIndex);
-    result.add(ResizableWidgetChildData(
-        widget: child,
-        percentage: originalPercentages[lastIndex],
-        index: lastIndex,
-        minPercentage: child.minPercentage,
-        maxPercentage: child.maxPercentage,
-        visible: child.visible,
-        cursorOverflowPercentageForHidding:
-            child.cursorOverflowPercentageForHidding,
-        cursorOverflowPercentageForShowing:
-            child.cursorOverflowPercentageForShowing));
+    result
+        .add(_buildChildData(child, originalPercentages[lastIndex], lastIndex));
 
     return result;
+  }
+
+  ResizableWidgetChildData _buildChildData(
+      Widget widget, double? percentage, int index) {
+    ResizableWidgetChildData data;
+    if (widget is ResizableWidgetChild) {
+      data = ResizableWidgetChildData(
+          widget: widget,
+          percentage: percentage,
+          index: index,
+          minPercentage: widget.minPercentage,
+          maxPercentage: widget.maxPercentage,
+          visible: widget.visible,
+          cursorOverflowPercentageForHidding:
+              widget.cursorOverflowPercentageForHidding,
+          cursorOverflowPercentageForShowing:
+              widget.cursorOverflowPercentageForShowing);
+      _setupActionHandler(data);
+    } else {
+      data = ResizableWidgetChildData(
+          widget: widget, percentage: percentage, index: index);
+    }
+    return data;
   }
 
   ResizableWidgetChild _buildWidget(
@@ -61,6 +64,32 @@ class WidgetChildBuilder {
         child: child,
         percentage: percentage,
       );
+    }
+  }
+
+  void _setupActionHandler(ResizableWidgetChildData data) {
+    if (data.widget is ResizableWidgetChild) {
+      ResizableWidgetChild widget = data.widget as ResizableWidgetChild;
+      if (widget.actionStream != null) {
+        widget.actionStream!.stream.listen((event) {
+          switch (event) {
+            case ResizableWidgetChildAction.hide:
+              controller.hide(data);
+              break;
+            case ResizableWidgetChildAction.show:
+              controller.show(data);
+              break;
+            case ResizableWidgetChildAction.toogleVisible:
+              if (data.visible) {
+                controller.hide(data);
+              } else {
+                controller.show(data);
+              }
+              break;
+            default:
+          }
+        });
+      }
     }
   }
 

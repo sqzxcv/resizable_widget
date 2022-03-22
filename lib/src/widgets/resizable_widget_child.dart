@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+enum ResizableWidgetChildAction { show, hide, toogleVisible }
 
 class ResizableWidgetChild extends StatelessWidget {
   final double? percentage;
@@ -8,7 +12,7 @@ class ResizableWidgetChild extends StatelessWidget {
   final bool visible;
   final double? cursorOverflowPercentageForHidding;
   final double? cursorOverflowPercentageForShowing;
-
+  final StreamController<ResizableWidgetChildAction>? actionStream;
   const ResizableWidgetChild({
     required this.child,
     this.percentage,
@@ -17,6 +21,7 @@ class ResizableWidgetChild extends StatelessWidget {
     this.visible = true,
     this.cursorOverflowPercentageForHidding,
     this.cursorOverflowPercentageForShowing,
+    this.actionStream,
     Key? key,
   }) : super(key: key);
 

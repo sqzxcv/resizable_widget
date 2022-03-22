@@ -52,6 +52,14 @@ class ResizableWidgetModel {
     return _resizer.tryHideOrShow(separatorIndex);
   }
 
+  bool show(ResizableWidgetChildData target) {
+    return _resizer.show(target);
+  }
+
+  bool hide(ResizableWidgetChildData target) {
+    return _resizer.hide(target);
+  }
+
   List<Widget> rebuildChildren() {
     return children.map((child) {
       if (child.needRebuild) {
@@ -139,24 +147,5 @@ class ResizableWidgetModel {
         }
       }
     }
-    // ResizableWidgetChildData targetBlock =
-    //     children[data.separatorIndex + (offset > 0 ? 1 : -1)];
-    // if (targetBlock.visible &&
-    //     targetBlock.cursorOverflowPercentageForHidding != null) {
-    //   double percentage = offset / (targetBlock.size! / 100);
-    //   print(offset);
-    //   print(percentage);
-    //   print(percentage.round());
-    //   print(targetBlock.cursorOverflowPercentageForHidding);
-    //   print('---------------');
-    //   if (percentage.round().abs() >
-    //       targetBlock.cursorOverflowPercentageForHidding! * 100) {
-    //     _resizer.hide(targetBlock);
-    //   }
-    // }
-    // _info.onResized?.call(children
-    //     .where((x) => x.widget is! Separator)
-    //     .map((x) => WidgetSizeInfo(size: x.size!, percentage: x.percentage!))
-    //     .toList());
   }
 }

@@ -44,6 +44,14 @@ class ResizableWidgetController {
     }
   }
 
+  bool show(ResizableWidgetChildData target) {
+    return _model.show(target);
+  }
+
+  bool hide(ResizableWidgetChildData target) {
+    return _model.hide(target);
+  }
+
   ResizeDirection determineResizeDirection(Offset offset) {
     return _model.determineResizeDirection(offset);
   }

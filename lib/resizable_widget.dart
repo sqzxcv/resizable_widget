@@ -8,5 +8,6 @@ export 'src/widgets/resizable_widget.dart'
         OnPanStartFunc,
         OnPanUpdateFunc,
         OnPanEndFunc;
-export 'src/widgets/resizable_widget_child.dart' show ResizableWidgetChild;
+export 'src/widgets/resizable_widget_child.dart'
+    show ResizableWidgetChild, ResizableWidgetChildAction;
 export 'src/models/widget_size_info.dart' show WidgetSizeInfo;
