@@ -31,28 +31,12 @@ class WidgetChildrenResizer {
       return false;
     }
 
-    final target = children[isLeft ? 0 : children.length - 1];
+    final target = isLeft ? children.first : children.last;
     final size = target.size!;
-    final coefficient = isLeft ? 1 : -1;
     if (_isNearlyZero(size)) {
-      // show
-      final offsetScala = maxSizeWithoutSeparators! *
-              (target.hidingPercentage ?? target.defaultPercentage!) -
-          size;
-      final offset = _info.isHorizontalSeparator
-          ? Offset(0, offsetScala * coefficient)
-          : Offset(offsetScala * coefficient, 0);
-      target.visible = true;
-      resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
+      show(target);
     } else {
-      // hide
-      target.visible = false;
-      target.hidingPercentage = target.percentage!;
-      final offsetScala = maxSizeWithoutSeparators! * target.hidingPercentage!;
-      final offset = _info.isHorizontalSeparator
-          ? Offset(0, -offsetScala * coefficient)
-          : Offset(-offsetScala * coefficient, 0);
-      resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
+      hide(target);
     }
 
     return true;
@@ -63,15 +47,24 @@ class WidgetChildrenResizer {
       return true;
     }
 
-    final offsetScala = maxSizeWithoutSeparators! * target.hidingPercentage!;
-    final offset = _info.isHorizontalSeparator
-        ? Offset(0, offsetScala)
-        : Offset(offsetScala, 0);
-    final separatorIndex = target.index == children.length - 1
-        ? target.index - 1
-        : target.index + 1;
+    bool isLast = target.index == children.length - 1;
+    final int coefficient = isLast ? -1 : 1;
+    final double offsetScala = maxSizeWithoutSeparators! *
+        (target.hidingPercentage ?? target.defaultPercentage!);
+    final Offset offset = _info.isHorizontalSeparator
+        ? Offset(0, offsetScala * coefficient)
+        : Offset(offsetScala * coefficient, 0);
+
+    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
+    final ResizableWidgetChildData relatedBlock =
+        children[isLast ? target.index - 2 : target.index + 2];
+
+    relatedBlock.minPercentage =
+        (relatedBlock.minPercentage ?? 0) - target.hidingPercentage!;
+
     target.hidingPercentage = null;
     target.visible = true;
+
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
     return true;
   }
@@ -80,16 +73,23 @@ class WidgetChildrenResizer {
     if (target.isNotVisible) {
       return true;
     }
+    final bool isLast = target.index == children.length - 1;
+    final int coefficient = isLast ? -1 : 1;
+
+    final double offsetScala = maxSizeWithoutSeparators! * target.percentage!;
+    final Offset offset = _info.isHorizontalSeparator
+        ? Offset(0, -offsetScala * coefficient)
+        : Offset(-offsetScala * coefficient, 0);
+
+    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
+    final ResizableWidgetChildData relatedBlock =
+        children[isLast ? target.index - 2 : target.index + 2];
+    // we need to save space if we will need to show this block
+    relatedBlock.minPercentage =
+        (relatedBlock.minPercentage ?? 0) + target.percentage!;
 
     target.hidingPercentage = target.percentage!;
     target.visible = false;
-    final offsetScala = maxSizeWithoutSeparators! * target.hidingPercentage!;
-    final offset = _info.isHorizontalSeparator
-        ? Offset(0, -offsetScala)
-        : Offset(-offsetScala, 0);
-    final separatorIndex = target.index == children.length - 1
-        ? target.index - 1
-        : target.index + 1;
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
     return true;
   }

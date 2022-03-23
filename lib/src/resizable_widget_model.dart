@@ -125,6 +125,7 @@ class ResizableWidgetModel {
       decreaseBlock = children[data.separatorIndex - 1];
     }
     if (decreaseBlock.visible &&
+        decreaseBlock.size! > 0 &&
         decreaseBlock.cursorOverflowPercentageForHidding != null) {
       double percentage = offset / (decreaseBlock.size! / 100);
       if (percentage.round().abs() >

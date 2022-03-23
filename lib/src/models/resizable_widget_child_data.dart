@@ -5,8 +5,8 @@ class ResizableWidgetChildData {
   double? percentage;
   final int index;
   bool visible;
-  final double? minPercentage;
-  final double? maxPercentage;
+  double? minPercentage;
+  double? maxPercentage;
   final double? cursorOverflowPercentageForHidding;
   final double? _cursorOverflowPercentageForShowing;
 
