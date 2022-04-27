@@ -6,6 +6,7 @@ import 'models/resizable_widget_child_data.dart';
 import 'models/resize_args.dart';
 import 'resizable_widget_controller.dart';
 import 'models/widget_size_info.dart';
+import 'widgets/resizable_widget_child.dart';
 import 'widgets/separator.dart';
 
 class WidgetChildrenResizer {
@@ -66,6 +67,12 @@ class WidgetChildrenResizer {
     target.visible = true;
 
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
+    if (target.widget is ResizableWidgetChild) {
+      ResizableWidgetChild widget = target.widget as ResizableWidgetChild;
+      if (widget.actionStream != null) {
+        widget.actionStream!.sink.add(ResizableWidgetChildAction.afterShow);
+      }
+    }
     return true;
   }
 
@@ -91,6 +98,12 @@ class WidgetChildrenResizer {
     target.hidingPercentage = target.percentage!;
     target.visible = false;
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
+    if (target.widget is ResizableWidgetChild) {
+      ResizableWidgetChild widget = target.widget as ResizableWidgetChild;
+      if (widget.actionStream != null) {
+        widget.actionStream!.sink.add(ResizableWidgetChildAction.afterHide);
+      }
+    }
     return true;
   }
 

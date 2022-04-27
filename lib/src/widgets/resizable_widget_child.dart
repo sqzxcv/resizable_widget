@@ -2,7 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-enum ResizableWidgetChildAction { show, hide, toogleVisible }
+enum ResizableWidgetChildAction {
+  show,
+  hide,
+  toogleVisible,
+  afterShow,
+  afterHide
+}
 
 class ResizableWidgetChild extends StatelessWidget {
   final double? percentage;
