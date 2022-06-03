@@ -16,8 +16,11 @@ class WidgetChildrenResizer {
   double? maxSize;
   double? get maxSizeWithoutSeparators => maxSize == null
       ? null
-      : maxSize! - (children.length ~/ 2) * _info.separatorSize;
+      : maxSize! - visibleSeparatorCount * _info.separatorSize;
 
+  int get visibleSeparatorCount => children
+      .where((element) => element.widget is Separator && element.visible)
+      .length;
   WidgetChildrenResizer(this.children, this._info, this._eventStream);
 
   bool tryHideOrShow(int separatorIndex) {
@@ -49,24 +52,26 @@ class WidgetChildrenResizer {
     }
 
     bool isLast = target.index == children.length - 1;
+    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
+
     final int coefficient = isLast ? -1 : 1;
-    final double offsetScala = maxSizeWithoutSeparators! *
+    double offsetScala = maxSizeWithoutSeparators! *
         (target.hidingPercentage ?? target.defaultPercentage!);
+    if ((isLast || target.index == 0) && target.hideSeparatorOnWidgetHide) {
+      offsetScala += _info.separatorSize;
+      children[separatorIndex].visible = true;
+      setBlockSize(children[separatorIndex],
+          WidgetSizeInfo(size: _info.separatorSize, percentage: 0));
+    }
     final Offset offset = _info.isHorizontalSeparator
         ? Offset(0, offsetScala * coefficient)
         : Offset(offsetScala * coefficient, 0);
-
-    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
-    final ResizableWidgetChildData relatedBlock =
-        children[isLast ? target.index - 2 : target.index + 2];
-
-    relatedBlock.minPercentage =
-        (relatedBlock.minPercentage ?? 0) - target.hidingPercentage!;
 
     target.hidingPercentage = null;
     target.visible = true;
 
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
+
     if (target.widget is ResizableWidgetChild) {
       ResizableWidgetChild widget = target.widget as ResizableWidgetChild;
       if (widget.actionStream != null) {
@@ -81,22 +86,24 @@ class WidgetChildrenResizer {
       return true;
     }
     final bool isLast = target.index == children.length - 1;
+    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
+
     final int coefficient = isLast ? -1 : 1;
 
-    final double offsetScala = maxSizeWithoutSeparators! * target.percentage!;
+    double offsetScala = maxSizeWithoutSeparators! * target.percentage!;
+    if ((isLast || target.index == 0) && target.hideSeparatorOnWidgetHide) {
+      children[separatorIndex].visible = false;
+      offsetScala += _info.separatorSize;
+      setBlockSize(children[separatorIndex],
+          const WidgetSizeInfo(size: 0, percentage: 0));
+    }
     final Offset offset = _info.isHorizontalSeparator
         ? Offset(0, -offsetScala * coefficient)
         : Offset(-offsetScala * coefficient, 0);
 
-    final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
-    final ResizableWidgetChildData relatedBlock =
-        children[isLast ? target.index - 2 : target.index + 2];
-    // we need to save space if we will need to show this block
-    relatedBlock.minPercentage =
-        (relatedBlock.minPercentage ?? 0) + target.percentage!;
-
     target.hidingPercentage = target.percentage!;
     target.visible = false;
+
     resize(ResizeArgs(separatorIndex: separatorIndex, offset: offset));
     if (target.widget is ResizableWidgetChild) {
       ResizableWidgetChild widget = target.widget as ResizableWidgetChild;
@@ -115,15 +122,13 @@ class WidgetChildrenResizer {
     if (!isMaxSizeChanged || children.isEmpty) {
       return;
     }
-
     maxSize = max;
-    final remain = maxSizeWithoutSeparators!;
-
+    final double remain = maxSizeWithoutSeparators!;
     bool prevHadNegative = false;
     for (var i = 0; i < children.length; i++) {
       ResizableWidgetChildData c = children[i];
       if (c.widget is Separator) {
-        double size = _info.separatorSize;
+        double size = c.visible ? _info.separatorSize : 0;
         if (prevHadNegative) {
           size = 0;
           prevHadNegative = false;
@@ -144,15 +149,50 @@ class WidgetChildrenResizer {
                 defaultPercentage: defaultPercentage));
       }
     }
+    for (var i = 0; i < children.length; i++) {
+      ResizableWidgetChildData c = children[i];
+      if (c.widget is Separator) {
+        continue;
+      }
+      var newSize = calculateNewSize(c, Offset.zero);
+      setBlockSize(c, newSize);
+    }
+  }
+
+  ResizableWidgetChildData? findNextCanBeSmaller(
+      int separatorIndex, int direction) {
+    if (direction == 0) {
+      return null;
+    }
+    int step;
+    bool Function(int) checker;
+    if (direction > 0) {
+      step = 1;
+      checker = (p0) => p0 < children.length;
+    } else {
+      step = -1;
+      checker = (p0) => p0 >= 0;
+    }
+
+    for (int i = separatorIndex; checker(i); i += step) {
+      if (children[i].widget is Separator) {
+        continue;
+      }
+      if (canBeSmaller(children[i])) {
+        return children[i];
+      }
+    }
+    return null;
   }
 
   void resize(ResizeArgs data) {
     ResizeDirection direction = determineResizeDirection(data.offset);
     switch (direction) {
       case ResizeDirection.left:
-        ResizableWidgetChildData leftData = children[data.separatorIndex - 1];
+        ResizableWidgetChildData? leftData =
+            findNextCanBeSmaller(data.separatorIndex, -1);
         ResizableWidgetChildData rightData = children[data.separatorIndex + 1];
-        if (canBeSmaller(leftData) && canBeBigger(rightData)) {
+        if (leftData != null && canBeBigger(rightData)) {
           WidgetSizeInfo newLeftSize = calculateNewSize(leftData, data.offset);
           // we need to set new data for correct calculation of maxPercentage in next block calculation
           // relevant in all directions
@@ -180,10 +220,11 @@ class WidgetChildrenResizer {
         }
         break;
       case ResizeDirection.right:
-        ResizableWidgetChildData rightData = children[data.separatorIndex + 1];
+        ResizableWidgetChildData? rightData =
+            findNextCanBeSmaller(data.separatorIndex, 1);
         ResizableWidgetChildData leftData = children[data.separatorIndex - 1];
 
-        if (canBeSmaller(rightData) && canBeBigger(leftData)) {
+        if (rightData != null && canBeBigger(leftData)) {
           WidgetSizeInfo newRightSize =
               calculateNewSize(rightData, data.offset * (-1));
           setBlockSize(rightData, newRightSize);
@@ -200,10 +241,11 @@ class WidgetChildrenResizer {
         }
         break;
       case ResizeDirection.top:
-        ResizableWidgetChildData topData = children[data.separatorIndex - 1];
+        ResizableWidgetChildData? topData =
+            findNextCanBeSmaller(data.separatorIndex, -1);
         ResizableWidgetChildData bottomData = children[data.separatorIndex + 1];
 
-        if (canBeSmaller(topData) && canBeBigger(bottomData)) {
+        if (topData != null && canBeBigger(bottomData)) {
           WidgetSizeInfo newTopSize = calculateNewSize(topData, data.offset);
           setBlockSize(topData, newTopSize);
 
@@ -220,10 +262,11 @@ class WidgetChildrenResizer {
         }
         break;
       case ResizeDirection.bottom:
-        ResizableWidgetChildData bottomData = children[data.separatorIndex + 1];
+        ResizableWidgetChildData? bottomData =
+            findNextCanBeSmaller(data.separatorIndex, 1);
         ResizableWidgetChildData topData = children[data.separatorIndex - 1];
 
-        if (canBeSmaller(bottomData) && canBeBigger(topData)) {
+        if (bottomData != null && canBeBigger(topData)) {
           WidgetSizeInfo newBottomSize =
               calculateNewSize(bottomData, data.offset * (-1));
           setBlockSize(bottomData, newBottomSize);
@@ -247,31 +290,30 @@ class WidgetChildrenResizer {
   bool blocksCanChangeTheirSize(ResizeArgs data) {
     ResizeDirection direction = determineResizeDirection(data.offset);
 
-    late ResizableWidgetChildData blockToDecrease;
+    late ResizableWidgetChildData? blockToDecrease;
     late ResizableWidgetChildData blockToIncrease;
 
     switch (direction) {
       case ResizeDirection.left:
-        blockToDecrease = children[data.separatorIndex - 1];
+        blockToDecrease = findNextCanBeSmaller(data.separatorIndex, -1);
         blockToIncrease = children[data.separatorIndex + 1];
         break;
       case ResizeDirection.right:
-        blockToDecrease = children[data.separatorIndex + 1];
+        blockToDecrease = findNextCanBeSmaller(data.separatorIndex, 1);
         blockToIncrease = children[data.separatorIndex - 1];
         break;
       case ResizeDirection.top:
-        blockToDecrease = children[data.separatorIndex - 1];
+        blockToDecrease = findNextCanBeSmaller(data.separatorIndex, -1);
         blockToIncrease = children[data.separatorIndex + 1];
         break;
       case ResizeDirection.bottom:
-        blockToDecrease = children[data.separatorIndex + 1];
+        blockToDecrease = findNextCanBeSmaller(data.separatorIndex, 1);
         blockToIncrease = children[data.separatorIndex - 1];
         break;
       default:
         return false;
     }
-
-    return canBeSmaller(blockToDecrease) && canBeBigger(blockToIncrease);
+    return blockToDecrease != null && canBeBigger(blockToIncrease);
   }
 
   WidgetSizeInfo calculateNewSize(
@@ -280,33 +322,34 @@ class WidgetChildrenResizer {
     double sizeAfter =
         size + (_info.isHorizontalSeparator ? offset.dy : offset.dx);
     double delta = 0;
+    double storeMaxSizeWithoutSeparators = maxSizeWithoutSeparators!;
     if (sizeAfter < 0) {
       delta = sizeAfter.abs();
       sizeAfter = 0;
     }
     double calculatedMaxSize =
         children.map((item) => item.size ?? 0).reduce((a, b) => a + b) -
-            (children.length ~/ 2) * _info.separatorSize;
+            visibleSeparatorCount * _info.separatorSize;
+
     if (calculatedMaxSize > 0) {
       double maxSizeAfter = calculatedMaxSize - size + sizeAfter;
-      if (maxSizeAfter >= maxSizeWithoutSeparators!) {
-        sizeAfter = sizeAfter - (maxSizeAfter - maxSizeWithoutSeparators!);
+      if (maxSizeAfter >= storeMaxSizeWithoutSeparators) {
+        sizeAfter = sizeAfter - (maxSizeAfter - storeMaxSizeWithoutSeparators);
       }
     }
-    double percentage = sizeAfter / maxSizeWithoutSeparators!;
-
+    double percentage = sizeAfter / storeMaxSizeWithoutSeparators;
     if (widgetChildData.visible) {
       if (widgetChildData.minPercentage != null &&
           percentage < widgetChildData.minPercentage!) {
         double minSize =
-            widgetChildData.minPercentage! * maxSizeWithoutSeparators!;
+            widgetChildData.minPercentage! * storeMaxSizeWithoutSeparators;
         delta += sizeAfter - minSize;
         sizeAfter = minSize;
         percentage = widgetChildData.minPercentage!;
       } else if (widgetChildData.maxPercentage != null &&
           percentage > widgetChildData.maxPercentage!) {
         double maxSize =
-            widgetChildData.maxPercentage! * maxSizeWithoutSeparators!;
+            widgetChildData.maxPercentage! * storeMaxSizeWithoutSeparators;
         delta = sizeAfter - maxSize;
         sizeAfter = maxSize;
         percentage = widgetChildData.maxPercentage!;
@@ -318,10 +361,10 @@ class WidgetChildrenResizer {
 
   void setBlockSize(
       ResizableWidgetChildData widgetChildData, WidgetSizeInfo size) {
-    widgetChildData.size = size.size;
-    widgetChildData.percentage = size.percentage;
+    widgetChildData.size = size.size.abs();
+    widgetChildData.percentage = size.percentage.abs();
     if (size.defaultPercentage != null) {
-      widgetChildData.defaultPercentage = size.defaultPercentage;
+      widgetChildData.defaultPercentage = size.defaultPercentage!.abs();
     }
     widgetChildData.needRebuild = true;
   }

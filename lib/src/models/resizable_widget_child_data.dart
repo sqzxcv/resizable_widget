@@ -9,6 +9,7 @@ class ResizableWidgetChildData {
   double? maxPercentage;
   final double? cursorOverflowPercentageForHidding;
   final double? _cursorOverflowPercentageForShowing;
+  final bool hideSeparatorOnWidgetHide;
 
   SizedBox? mountedWidget;
   double? size;
@@ -39,6 +40,7 @@ class ResizableWidgetChildData {
     this.minPercentage,
     this.maxPercentage,
     this.cursorOverflowPercentageForHidding,
+    this.hideSeparatorOnWidgetHide = false,
     double? cursorOverflowPercentageForShowing,
   }) : _cursorOverflowPercentageForShowing = cursorOverflowPercentageForShowing;
 }
