@@ -49,7 +49,8 @@ class WidgetChildBuilder {
           cursorOverflowPercentageForHidding:
               widget.cursorOverflowPercentageForHidding,
           cursorOverflowPercentageForShowing:
-              widget.cursorOverflowPercentageForShowing);
+              widget.cursorOverflowPercentageForShowing,
+          hideSeparatorOnWidgetHide: widget.hideSeparatorOnWidgetHide);
       _setupActionHandler(data);
     } else {
       data = ResizableWidgetChildData(

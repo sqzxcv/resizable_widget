@@ -19,6 +19,7 @@ class ResizableWidgetChild extends StatelessWidget {
   final double? cursorOverflowPercentageForHidding;
   final double? cursorOverflowPercentageForShowing;
   final StreamController<ResizableWidgetChildAction>? actionStream;
+  final bool hideSeparatorOnWidgetHide;
   const ResizableWidgetChild({
     required this.child,
     this.percentage,
@@ -28,6 +29,7 @@ class ResizableWidgetChild extends StatelessWidget {
     this.cursorOverflowPercentageForHidding,
     this.cursorOverflowPercentageForShowing,
     this.actionStream,
+    this.hideSeparatorOnWidgetHide = false,
     Key? key,
   }) : super(key: key);
 
