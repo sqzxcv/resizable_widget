@@ -28,11 +28,7 @@ class _SeparatorState extends State<Separator> {
           cursor: widget.info.isHorizontal
               ? SystemMouseCursors.resizeRow
               : SystemMouseCursors.resizeColumn,
-          child: SizedBox(
-            child: Container(color: widget.info.color),
-            width: widget.info.isHorizontal ? double.infinity : 0,
-            height: widget.info.isHorizontal ? 0 : double.infinity,
-          ),
+          child: Container(color: widget.info.color),
         ),
         onPanUpdate: (details) => _controller.onPanUpdate(details, context),
         onPanStart: (details) => _controller.onPanStart(details, context),
