@@ -3,6 +3,8 @@ import 'package:resizable_widget/src/models/resizable_widget_args_info.dart';
 import 'package:resizable_widget/src/resizable_widget_controller.dart';
 import 'package:resizable_widget/src/models/widget_size_info.dart';
 
+import 'resizable_widget_child.dart';
+
 /// The callback argument type of [ResizableWidget.onResized].
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
 
@@ -22,7 +24,7 @@ typedef OnPanEndFunc = bool Function(
 /// Users can resize the internal widgets by dragging.
 class ResizableWidget extends StatefulWidget {
   /// Resizable widget list.
-  final List<Widget> children;
+  final List<ResizableWidgetChild> children;
 
   /// Sets the default [children] width or height as percentages.
   ///

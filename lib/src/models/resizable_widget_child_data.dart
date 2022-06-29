@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:resizable_widget/src/widgets/resizable_widget_child.dart';
 
 class ResizableWidgetChildData {
-  final Widget widget;
+  final ResizableWidgetChild widget;
   double? percentage;
   final int index;
   bool visible;

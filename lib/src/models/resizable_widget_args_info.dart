@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 
 class ResizableWidgetArgsInfo {
-  final List<Widget> children;
+  final List<ResizableWidgetChild> children;
   final bool isHorizontalSeparator;
   final bool isDisabledSmartHide;
   final double separatorSize;
