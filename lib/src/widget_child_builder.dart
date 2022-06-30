@@ -62,9 +62,9 @@ class WidgetChildBuilder {
       data.visible = false;
       if (widget.percentage != null &&
           (widget.minPercentage == null ||
-              widget.percentage! > widget.minPercentage!) &&
+              widget.percentage! >= widget.minPercentage!) &&
           (widget.maxPercentage == null ||
-              widget.percentage! < widget.maxPercentage!)) {
+              widget.percentage! <= widget.maxPercentage!)) {
         data.defaultPercentage = widget.percentage;
         data.hidingPercentage = widget.percentage;
       } else if (widget.minPercentage != null) {
@@ -158,8 +158,8 @@ class WidgetChildBuilder {
         return 0.0;
       }
       if (percentage != null &&
-          (child.minPercentage == null || percentage > child.minPercentage!) &&
-          (child.maxPercentage == null || percentage < child.maxPercentage!)) {
+          (child.minPercentage == null || percentage >= child.minPercentage!) &&
+          (child.maxPercentage == null || percentage <= child.maxPercentage!)) {
         return child.percentage!;
       }
       if (defaultPercentage != 0) {
