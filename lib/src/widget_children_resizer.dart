@@ -152,12 +152,30 @@ class WidgetChildrenResizer {
     for (var i = 0; i < children.length; i++) {
       ResizableWidgetChildData c = children[i];
       if (c.widget is Separator) {
+        // resize(ResizeArgs(separatorIndex: i, offset: Offset.zero));
         continue;
       }
+      // setBlockSize(c, calculateNewSize(c, Offset.zero));
       if (c.isNotVisible) {
         hide(c, force: true);
       }
     }
+    normalize();
+  }
+
+  void normalize() {
+    double currentSum = children
+        .map((e) => e.percentage ?? 0)
+        .toList()
+        .fold<double>(0, (previous, current) => previous + current);
+    double diff = 1 - currentSum;
+    ResizableWidgetChildData last =
+        children.lastWhere((element) => element.visible);
+
+    double newPercentage = (last.percentage ?? 0) + diff;
+    double newSize = maxSizeWithoutSeparators! * newPercentage;
+    setBlockSize(
+        last, WidgetSizeInfo(percentage: newPercentage, size: newSize));
   }
 
   ResizableWidgetChildData? findNextCanBeSmaller(
