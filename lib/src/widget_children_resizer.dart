@@ -54,7 +54,7 @@ class WidgetChildrenResizer {
     bool isLast = target.index == children.length - 1;
     final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
 
-    final int coefficient = isLast ? -1 : 1;
+    final double coefficient = isLast ? -1 : 1;
     double offsetScala = maxSizeWithoutSeparators! *
         (target.hidingPercentage ?? target.defaultPercentage!);
     if ((isLast || target.index == 0) && target.hideSeparatorOnWidgetHide) {
@@ -90,9 +90,10 @@ class WidgetChildrenResizer {
     final bool isLast = target.index == children.length - 1;
     final int separatorIndex = isLast ? target.index - 1 : target.index + 1;
 
-    final int coefficient = isLast ? -1 : 1;
+    final double coefficient = isLast ? -1 : 1;
 
-    double offsetScala = maxSizeWithoutSeparators! * target.percentage!;
+    double offsetScala =
+        target.size ?? maxSizeWithoutSeparators! * target.percentage!;
     if ((isLast || target.index == 0) && target.hideSeparatorOnWidgetHide) {
       children[separatorIndex].visible = false;
       offsetScala += _info.separatorSize;
