@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'models/resizable_widget_args_info.dart';
 import 'models/resizable_widget_child_data.dart';
 import 'models/resize_args.dart';
@@ -12,14 +14,13 @@ class ResizableWidgetController {
   Stream<Object> get resizeEventStream => _model.resizeEventStream;
 
   List<ResizableWidgetChildData> get children => _model.children;
-  List<Widget> get childrenWidgets =>
-      _model.children.map((e) => e.widget).toList();
+  List<Widget> get childrenWidgets => _model.children.map((e) => e.widget).toList();
 
-  ResizableWidgetController(ResizableWidgetArgsInfo info)
-      : _model = ResizableWidgetModel(info) {
+  ResizableWidgetController(ResizableWidgetArgsInfo info) : _model = ResizableWidgetModel(info) {
     _model.init(this);
   }
 
+  /// 父容器大小发送变化时. 会调用该方法进行重绘
   void setSizeIfNeeded(BoxConstraints constraints) {
     _model.setSizeIfNeeded(constraints);
     _model.callOnResized();
@@ -27,10 +28,12 @@ class ResizableWidgetController {
 
   void resize(ResizeArgs data) {
     if (_model.resize(data)) {
+      print("2222");
       _model.callOnResized();
     } else {
       double? cursorOverflow = _model.cursorOverflowOffset(data);
       if (cursorOverflow != null) {
+        print("333");
         _model.callOnCursorOverflow(data, cursorOverflow);
       }
     }

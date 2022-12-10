@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:resizable_widget/src/models/resizable_widget_args_info.dart';
-import 'package:resizable_widget/src/resizable_widget_controller.dart';
 import 'package:resizable_widget/src/models/widget_size_info.dart';
+import 'package:resizable_widget/src/resizable_widget_controller.dart';
 
 import 'resizable_widget_child.dart';
 
@@ -9,16 +9,13 @@ import 'resizable_widget_child.dart';
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
 
 /// The callback Separator onPanStart event. If result of function is true, it will stop logic and will not run default reactions.
-typedef OnPanStartFunc = bool Function(
-    DragStartDetails details, BuildContext context);
+typedef OnPanStartFunc = bool Function(DragStartDetails details, BuildContext context);
 
 /// The callback Separator onPanUpdate event. If result of function is true, it will stop logic and will not run default reactions.
-typedef OnPanUpdateFunc = bool Function(
-    DragUpdateDetails details, BuildContext context);
+typedef OnPanUpdateFunc = bool Function(DragUpdateDetails details, BuildContext context);
 
 /// The callback Separator onPanEnd event. If result of function is true, it will stop logic and will not run default reactions.
-typedef OnPanEndFunc = bool Function(
-    DragEndDetails details, BuildContext context);
+typedef OnPanEndFunc = bool Function(DragEndDetails details, BuildContext context);
 
 /// Holds resizable widgets as children.
 /// Users can resize the internal widgets by dragging.
@@ -77,8 +74,7 @@ class ResizableWidget extends StatefulWidget {
       {Key? key,
       required this.children,
       this.percentages,
-      @Deprecated('Use [isHorizontalSeparator] instead')
-          this.isColumnChildren = false,
+      @Deprecated('Use [isHorizontalSeparator] instead') this.isColumnChildren = false,
       this.isHorizontalSeparator = false,
       this.isDisabledSmartHide = false,
       this.separatorSize = 4,
@@ -90,8 +86,7 @@ class ResizableWidget extends StatefulWidget {
       : super(key: key) {
     assert(children.isNotEmpty);
     assert(percentages == null || percentages!.length == children.length);
-    assert(percentages == null ||
-        percentages!.reduce((value, element) => value + element) == 1);
+    assert(percentages == null || percentages!.reduce((value, element) => value + element) == 1);
   }
 
   @override
@@ -117,9 +112,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           return StreamBuilder(
               stream: _controller.resizeEventStream,
               builder: (context, snapshot) {
-                return _info.isHorizontalSeparator
-                    ? Column(children: _controller.rebuildChildren())
-                    : Row(children: _controller.rebuildChildren());
+                return _info.isHorizontalSeparator ? Column(children: _controller.rebuildChildren()) : Row(children: _controller.rebuildChildren());
               });
         },
       );

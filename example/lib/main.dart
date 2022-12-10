@@ -29,37 +29,40 @@ class MyPage extends StatelessWidget {
       ),
       body: ResizableWidget(
         isHorizontalSeparator: false,
-        isDisabledSmartHide: false,
+        isDisabledSmartHide: true,
         separatorColor: Colors.white12,
         separatorSize: 4,
         onResized: _printResizeInfo,
         children: [
-          ResizableWidgetChild(child: Container(color: Colors.greenAccent)),
           ResizableWidgetChild(
-            child: ResizableWidget(
-              isHorizontalSeparator: true,
-              separatorColor: Colors.blue,
-              separatorSize: 10,
-              children: [
-                ResizableWidgetChild(
-                    child: Container(color: Colors.greenAccent)),
-                ResizableWidgetChild(
-                  child: ResizableWidget(
-                    children: [
-                      ResizableWidgetChild(
-                          child: Container(color: Colors.greenAccent)),
-                      ResizableWidgetChild(
-                          child: Container(color: Colors.yellowAccent)),
-                      ResizableWidgetChild(
-                          child: Container(color: Colors.redAccent)),
-                    ],
-                    percentages: const [0.2, 0.5, 0.3],
-                  ),
-                ),
-                ResizableWidgetChild(child: Container(color: Colors.redAccent)),
-              ],
-            ),
+            child: Container(color: Colors.greenAccent),
+            fixSize: 300,
           ),
+          // ResizableWidgetChild(
+          //   child: ResizableWidget(
+          //     isHorizontalSeparator: true,
+          //     separatorColor: Colors.blue,
+          //     separatorSize: 10,
+          //     children: [
+          //       ResizableWidgetChild(
+          //           child: Container(color: Colors.greenAccent)),
+          //       ResizableWidgetChild(
+          //         child: ResizableWidget(
+          //           children: [
+          //             ResizableWidgetChild(
+          //                 child: Container(color: Colors.greenAccent)),
+          //             ResizableWidgetChild(
+          //                 child: Container(color: Colors.yellowAccent)),
+          //             ResizableWidgetChild(
+          //                 child: Container(color: Colors.redAccent)),
+          //           ],
+          //           percentages: const [0.2, 0.5, 0.3],
+          //         ),
+          //       ),
+          //       ResizableWidgetChild(child: Container(color: Colors.redAccent)),
+          //     ],
+          //   ),
+          // ),
           ResizableWidgetChild(child: Container(color: Colors.redAccent)),
         ],
       ),
