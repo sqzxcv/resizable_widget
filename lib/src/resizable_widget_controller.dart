@@ -28,12 +28,12 @@ class ResizableWidgetController {
 
   void resize(ResizeArgs data) {
     if (_model.resize(data)) {
-      print("2222");
+      // print("2222");
       _model.callOnResized();
     } else {
       double? cursorOverflow = _model.cursorOverflowOffset(data);
       if (cursorOverflow != null) {
-        print("333");
+        // print("333");
         _model.callOnCursorOverflow(data, cursorOverflow);
       }
     }
